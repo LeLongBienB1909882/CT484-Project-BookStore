@@ -37,27 +37,24 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           const Divider(),
-           auth.isAdmin
-          ? 
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Quản lý trận đấu'),
-            onTap: () {
-              Navigator.of(context)
-                  .pushReplacementNamed(UserBooksScreen.routeName);
-            },
-          )
-          : Text(
-            auth.email.toString(),
-            style: TextStyle(  
-              fontSize: 16
-            ),
-          ),
+          auth.isAdmin
+              ? ListTile(
+                  leading: const Icon(Icons.edit),
+                  title: const Text('Quản lý Sản Phẩm'),
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(UserBooksScreen.routeName);
+                  },
+                )
+              : Text(
+                  auth.email.toString(),
+                  style: TextStyle(fontSize: 16),
+                ),
           const Divider(),
-          ListTile(  
+          ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Đăng Xuất'),
-            onTap:  () {
+            onTap: () {
               Navigator.of(context)
                 ..pop()
                 ..pushReplacementNamed('/');

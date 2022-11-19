@@ -16,8 +16,8 @@ class AuthManager with ChangeNotifier {
     return authToken != null && authToken!.isValid;
   }
 
-   bool get isAdmin {
-    return _authEmail == 'bien@gmail.com';
+  bool get isAdmin {
+    return _authEmail == 'admin@gmail.com';
   }
 
   String? get email {
@@ -28,7 +28,7 @@ class AuthManager with ChangeNotifier {
     return _authToken;
   }
 
-  void _setEmail(String email){
+  void _setEmail(String email) {
     _authEmail = email;
     notifyListeners();
   }
