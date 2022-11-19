@@ -1,52 +1,76 @@
+import 'package:flutter/foundation.dart';
+
+import '../../models/auth_token.dart';
 import '../../models/book.dart';
+import '../../services/books_service.dart';
 
-class BookManager {
-  final List<Book> _items = [
 
-  ];
+class BookManager with ChangeNotifier {
+  List<Book> _items = [];
+
+  final ProductsService _productsService;
+
+  BookManager([AuthToken? authToken])
+    : _productsService = ProductsService(authToken);
+
+  set authToken(AuthToken? authToken){
+    _productsService.authToken = authToken;
+  }
+
+  Future<void> fetchProducts() async {
+    _items = await _productsService.fetchProducts();
+    notifyListeners();
+  }
 
   int get itemCount {
     return _items.length;
   }
 
-  List<Book> get items {
-    return [
-      
-      Book(
-        id: 'p1',
-        name: 'A',
-        description: 'A red shirt - it is pretty red!',
-        price: 29.99,
-        media: ' Bảo vệ quyền riêng tư 100% và trùng khớp 99%! Tìm kiếm Text To Speech Maker. Kết quả tức thì và cá nhân hóa Tìm kiếm! Truy cập không giới hạn. Luôn luôn trung thực. Tài nguyên tốt nhất. Kết quả và câu trả lời. An toàn 100%.',
-        imageUrl:
-            'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-        isFavorite: true,
-      ),
-      Book(
-        id: 'p2',
-        name: 'B',
-        description: 'A red shirt - it is pretty red!',
-        price: 29.99,
-        media: ' Bảo vệ quyền riêng tư 100% và trùng khớp 99%! Tìm kiếm Text To Speech Maker. Kết quả tức thì và cá nhân hóa Tìm kiếm! Truy cập không giới hạn. Luôn luôn trung thực. Tài nguyên tốt nhất. Kết quả và câu trả lời. An toàn 100%.',
-        imageUrl:
-            'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-        isFavorite: true,
-      ),
-      Book(
-        id: 'p',
-        name: 'C',
-        description: 'A red shirt - it is pretty red!',
-        price: 29.99,
-        media: ' Bảo vệ quyền riêng tư 100% và trùng khớp 99%! Tìm kiếm Text To Speech Maker. Kết quả tức thì và cá nhân hóa Tìm kiếm! Truy cập không giới hạn. Luôn luôn trung thực. Tài nguyên tốt nhất. Kết quả và câu trả lời. An toàn 100%.',
-        imageUrl:
-            'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-        isFavorite: true,
-      ),
-    ];
+  List<Book> get books {
+    return _items;
   }
 
+  List<Book> get favoriteItems {
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
+  }
+
+
   Book findById(String id){
-    return items.firstWhere((prod) => prod.id == id);
+    return _items.firstWhere((prod) => prod.id == id);
+  }
+
+  Future<void> addProduct(Book product) async {
+    final newProduct = await _productsService.addProduct(product);
+    if(newProduct != null){
+      _items.add(newProduct);
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateProduct(Book product) async {
+    if(!await _productsService.updateBook(product)){
+      notifyListeners();
+    }
+  }
+
+  Future<void> toggleFavoriteStatus(Book product) async {
+    final savedStatus = product.isFavorite;
+    product.isFavorite = !savedStatus;
+
+    if(!await _productsService.saveFavoriteStatus(product)){
+      product.isFavorite = savedStatus;
+    }
+  }
+
+  Future<void> deleteProduct(String id) async {
+    final index = _items.indexWhere((item) => item.id == id);
+    Book? existingProducct = _items[index];
+    _items.removeAt(index);
+    notifyListeners();
+    if(!await _productsService.deleteProduct(id)){
+      _items.insert(index, existingProducct);
+      notifyListeners();
+    }
   }
 
 }

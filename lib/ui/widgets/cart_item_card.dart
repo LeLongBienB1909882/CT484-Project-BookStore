@@ -1,44 +1,45 @@
 import 'package:flutter/material.dart';
-import '../../models/cart.dart';
+import 'package:myapp/models/cart_item.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/cart_item.dart';
+import '../manager/cart_manager.dart';
 import '../shared/dialog_utils.dart';
 
-class CartItemCart extends StatelessWidget {
+class CartItemCard extends StatelessWidget {
   final String productId;
   final CartItem cardItem;
 
-  const CartItemCart({
+  const CartItemCard({
+    super.key, 
     required this.productId,
     required this.cardItem,
-    super.key,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Dismissible(
+  @override 
+  Widget build(BuildContext context){
+    return Dismissible(  
       key: ValueKey(cardItem.id),
-      background: Container(
+      background: Container(  
         color: Theme.of(context).errorColor,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        margin: const EdgeInsets.symmetric(
+        margin: const EdgeInsets.symmetric(  
           horizontal: 15,
           vertical: 4,
         ),
-        child: const Icon(
+        child: const Icon(  
           Icons.delete,
           color: Colors.white,
           size: 40,
         ),
       ),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (direction) {
-        return showConfirmDialog(
-          context,
-          'Do you want to remove the item from the cart?',
-        );
+      direction:  DismissDirection.endToStart,
+      confirmDismiss: (direction){
+        return showConfirmDialog(context, 'Do you want to remove the item from the cart?');
       },
       onDismissed: (direction) {
-        print('cart item dismissed');
+        context.read<CartManager>().removeItem(productId);
       },
       child: buildItemCard(),
     );
@@ -46,24 +47,22 @@ class CartItemCart extends StatelessWidget {
 
   Widget buildItemCard() {
     return Card(
-      margin: const EdgeInsets.symmetric(
+      margin: const EdgeInsets.symmetric(  
         horizontal: 15,
-        vertical: 4,
+        vertical: 4
       ),
-      child: Padding(
+
+      child: Padding(  
         padding: const EdgeInsets.all(8),
-        child: ListTile(
-          leading: CircleAvatar(
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: FittedBox(
-                child: Text('\$${cardItem.price}'),
-              ),
+        child: ListTile(  
+          leading: Image(
+            image: NetworkImage(
+              cardItem.imageUrl,
             ),
           ),
           title: Text(cardItem.title),
-          subtitle: Text('Total: \$${(cardItem.price * cardItem.quantity)}'),
-          trailing: Text('${cardItem.quantity} x'),
+          subtitle:  Text('Giá ${cardItem.price}'),
+          trailing: Text('SL: ${cardItem.quantity}'),
         ),
       ),
     );

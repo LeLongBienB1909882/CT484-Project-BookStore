@@ -18,14 +18,14 @@ class CartItem {
     String? title,
     int? quantity,
     double? price,
-    String? imageUrl,
-  }) {
+    String? imageUrl
+  }){
     return CartItem(
       id: id ?? this.id,
       title: title ?? this.title,
       quantity: quantity ?? this.quantity,
-      price: price ?? this.price,
-      imageUrl: imageUrl ?? this.imageUrl,
+      price:  price ?? this.price,
+      imageUrl: imageUrl ?? this.imageUrl
     );
   }
 }

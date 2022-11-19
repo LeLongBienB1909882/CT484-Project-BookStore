@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:myapp/ui/auth/auth_manager.dart';
+import 'package:myapp/ui/manager/cart_manager.dart';
+import 'package:myapp/ui/manager/order_manager.dart';
+import 'package:myapp/ui/screens/orders_screen.dart';
 import 'screens.dart';
-import './models/book.dart';
-import './screens.dart';
+import 'package:provider/provider.dart';
 import './ui/manager/book_manager.dart';
-void main() {
+import 'ui/screens/edit_book.dart';
+import 'ui/screens/user_books_screen.dart';
+import 'ui/splash_screen.dart';
+
+Future<void> main()  async {
+  await dotenv.load();
   runApp(const MyApp());
 }
 
@@ -13,41 +22,82 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final book = Book(
-      id: 'p1',
-      name: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      media: ' Bảo vệ quyền riêng tư 100% và trùng khớp 99%! Tìm kiếm Text To Speech Maker.',
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-      isFavorite: true,
-    );
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: BookOverviewScreen(),
-      routes: {
-        CartScreen.routeName: (ctx) => const CartScreen(),
-        OrdersScreen.routeName: (ctx) => const OrdersScreen(),
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == DetailBook.routeName) {
-          final bookId = settings.arguments as String;
-          return MaterialPageRoute(
-            builder: (ctx) {
-              return DetailBook(
-                book: BookManager().findById(bookId),
-                title: "App",
-              );
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthManager(),
+        ),
+        ChangeNotifierProxyProvider<AuthManager, BookManager>(
+          create: (ctx) => BookManager(),
+          update: (ctx, authManager, productsmanager){
+            productsmanager!.authToken = authManager.authToken;
+            return productsmanager;
+          }
+        ),
+        ChangeNotifierProvider(create: (ctx) => CartManager()),
+        ChangeNotifierProvider(create: (ctx) => OrdersManager())
+
+      ],
+      child: Consumer<AuthManager>(  
+        builder: (context, authmanager, child) {
+          return MaterialApp(
+            title: 'Flutter Demo',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              primarySwatch: Colors.green,
+            ),
+            home: authmanager.isAuth
+                ? const BookOverviewScreen()
+                : FutureBuilder(
+                  future: authmanager.tryAutoLogin(),
+                  builder: (ctx, snapshot) {
+                    return snapshot.connectionState == ConnectionState.waiting
+                        ? const SplashScreen()
+                        : const AuthScreen();
+                  },
+                ),
+            routes: {
+              CartScreen.routeName: (ctx) => const CartScreen(),
+              OrdersScreen2.routeName: (ctx) => const OrdersScreen2(),
+              UserBooksScreen.routeName: (ctx) => const UserBooksScreen(),
+            },
+            onGenerateRoute: (settings) {
+              if (settings.name == DetailBook.routeName) {
+                final bookId = settings.arguments as String;
+                return MaterialPageRoute(
+                  builder: (ctx) {
+                    return DetailBook(
+                      ctx.read<BookManager>().findById(bookId)
+                    );
+                  },
+                );
+              }
+              if (settings.name == EditBook.routeName) {
+                final productId = settings.arguments as String?;
+                return MaterialPageRoute(builder: (ctx) {
+                  return EditBook(
+                    productId != null
+                        ? ctx.read<BookManager>().findById(productId)
+                        : null,
+                  );
+                });
+              }
+              if (settings.name == DetailBook.routeName) {
+                final matchId = settings.arguments as String;
+                return MaterialPageRoute(
+                  builder: (ctx) {
+                    return DetailBook(
+                      ctx.read<BookManager>().findById(matchId),
+                    );
+                  },
+                );
+              }
+              return null;
             },
           );
-        }
-        return null;
-      },
+        },
+      )
+      
     );
   }
 }
-

@@ -1,65 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/ui/manager/order_manager.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../models/order.dart';
+import '../../ui/manager/order_manager.dart';
 import 'dart:math';
 import '../shared/drawer.dart';
-import '../../models/Cart.dart';
-import '../widgets/detail_order.dart';
-class OrdersScreen extends StatelessWidget {
-  static const routeName = '/order';
+class OrdersScreen2 extends StatelessWidget {
+  static const routeName = '/order-screen2';
 
-  const OrdersScreen({super.key});
+  const OrdersScreen2({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // final cart = CartManager();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Đơn Hàng Của Bạn'),
         
       ),
       drawer: const AppDrawer(),
-      body: BuilCardDetail(context),
+      body: Consumer<OrdersManager>(  
+        builder: (ctx, ordersManager, child) {
+          return ListView.builder(
+            itemCount: ordersManager.orderCount,
+            itemBuilder: (ctx, i) => BuilCardDetail(ordersManager.orders[i]),
+          );
+        },
+      ),
     );
   }
 
-  Widget BuilCardDetail(BuildContext context){
-    final orderList = OrdersManager();
-    final items =  CartItem(
-          id: 'c1',
-          title: 'Red Shirt',
-          quantity: 2,
-          imageUrl: 'https://americastarbooks.com/wp-content/uploads/2018/11/noi-dung-sach-dac-nhan-tam-1280x720.jpg',
-          price: 29.99,
-        );
+  Widget BuilCardDetail(OrderItem orderItem){
+    final f = NumberFormat("0.0#", "en_US");
     return SizedBox(
-      height: 300,
+      height: max(200, (orderItem.products.length * 50) + 110),
       child: Card(
         margin: EdgeInsets.all(16.0),
         child: Padding( 
           padding: EdgeInsets.all(8.0),
           child: Column(  
             children: [
-              Text(orderList.orders[0].user.fullname),
               const SizedBox(
                 height: 6, // <-- SEE HERE
               ),
-              Text('Ngày đặt: ${orderList.orders[0].dateTime}'),
+              Text('Ngày đặt:  ${orderItem.dateTime}'),
+              Divider(
+                color: Colors.black
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Ảnh'),
+                  Text('Tên Sản Phẩm'),
+                  Text('SL'),
+                  Text('Giá'),
+                  Text('Tổng'),
+                ],
+              ),
               Container(
                 child: ListView.builder(
-                  itemCount: 2,
-                  itemBuilder: (context, index) => Text('123'),
-                )
-              )
+                  shrinkWrap: true,
+                  itemCount: orderItem.products.length,
+                  itemBuilder: (ctx, index) => Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Image(
+                          width: 30,
+                          height: 30,
+                          image: NetworkImage(orderItem.products[index].imageUrl)
+                        ),
+                        const SizedBox(width: 4),
+                        SizedBox(
+                          width: 100.0,
+                          child: Text(
+                            orderItem.products[index].title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text('${orderItem.products[index].quantity}'),
+                        const SizedBox(width: 4),
+                        Text('${f.format(orderItem.products[index].price)}'),
+                        const SizedBox(width: 4),
+                        Text('${ f.format(orderItem.products[index].price * orderItem.products[index].quantity)}'),
+                      ],
+                    ),
+                  )
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
-  // Widget DetailOrder(CartItem cart){
-  //   return 
-  // }
-
-  
 }

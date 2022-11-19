@@ -1,74 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/book.dart';
+import '../../models/book.dart';
 import '../widgets/card_book.dart';
 import '../manager/book_manager.dart';
 
 class DetailBook extends StatelessWidget {
-  const DetailBook({Key? key, required this.book, required this.title}) : super(key: key);
   static const routeName = '/book-detail';
-
+  const DetailBook(
+    this.book,{
+      super.key,
+    }
+  );
   final Book book;
-  final String title;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-
-        title: Text(title),
-      ),
-      body: Container(  
-        decoration: BoxDecoration(
-          color: Colors.white
+        appBar: AppBar(
+          title: Text(book.name),
         ),
-        child: Container(  
-          child: Column(  
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    height: 200,
-                    width: 300,
-                    decoration: BoxDecoration(
-                      border: Border.all( //<-- SEE HERE
-                        width: 2,
-                        color: Colors.black.withOpacity(0.7)
-                      ),
-                    ),
-                    child: Row(  
-                      mainAxisAlignment: MainAxisAlignment.center,
+        body: Container(
+          decoration: const BoxDecoration(color: Colors.white),
+          child: Padding( 
+            padding: EdgeInsets.fromLTRB(20, 30, 30, 20), 
+            child: Container(
+                child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                        height: 200,
+                        width: 300,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 2,
+                            color: Colors.black.withOpacity(0.7)
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image(
+                              image: NetworkImage(
+                                book.imageUrl
+                              ),
+                              fit: BoxFit.cover,
+                            )
+                          ],
+                        ))
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
                       children: [
-                        Image(image: NetworkImage(book.imageUrl))
+                        const SizedBox(height: 10,),
+                        Text(
+                          book.name,
+                          style: const TextStyle(  
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        const SizedBox(height: 10,),
+                        Text(
+                          book.description,
+                          style: const TextStyle(  
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 10,),
+                        Text(
+                          'Giá: ${book.price}',
+                          style: const TextStyle(  
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 170, 15, 54)
+                          ),
+                        ),
                       ],
                     )
-                  )
-                ],
-              ),
-            
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        book.name,
-                      ),
-                      Text(
-                        book.description,
-                      ),
-                      Text(
-                        '${book.price}'
-                      ),
-                      
-                    ],
-                  )
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ))),
           )
-        )
-      )
-    );
+            
+        );
   }
 }
-

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/cart.dart';
+import '../../models/cart_item.dart';
 
 class DetailOrder extends StatelessWidget {
   // List<CartItem> cart;
@@ -13,22 +13,20 @@ class DetailOrder extends StatelessWidget {
   //         price: 29.99,
   //       )
   //     ];
-   DetailOrder({
+  DetailOrder({
     // required this.cart,
     super.key,
   });
 
-  @override 
-
-  Widget build(BuildContext context){
+  @override
+  Widget build(BuildContext context) {
     return Container(
       child: ListView.builder(
-            itemCount: 1,
-              itemBuilder: (context, i){
-                return Text('123123');
-              },
-          ),
+        itemCount: 1,
+        itemBuilder: (context, i) {
+          return Text('123123');
+        },
+      ),
     );
   }
-
 }

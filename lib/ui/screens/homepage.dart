@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/ui/widgets/home.dart';
+import 'package:myapp/ui/widgets/info_user.dart';
+import '../manager/cart_manager.dart';
 import '../widgets/card_book.dart';
 import '../manager/book_manager.dart';
 import '../../screens.dart';
 import '../widgets/top_right_badge.dart';
+import 'package:provider/provider.dart';
+
+enum FilterOptions { favorites, all }
 
 class BookOverviewScreen extends StatefulWidget {
   const BookOverviewScreen({super.key});
@@ -12,50 +18,131 @@ class BookOverviewScreen extends StatefulWidget {
 }
 
 class _BookOverviewScreenState extends State<BookOverviewScreen> {
-  // const MyHomePage({Key? key, required this.title}) : super(key: key);
+  final _showOnlyFavorites = ValueNotifier<bool>(false);
+  late Future<void> _fetchBooks;
+  @override 
+  void initState(){
+    super.initState();
+    _fetchBooks = context.read<BookManager>().fetchProducts();
+  }
+  int _selectedIndex = 1;
+  String titlePage = '';
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const List<Widget> _widgetOptions = <Widget>[
+    Home(),
+    Text('2'),
+    InfoUser(),
+  ];
 
-  // final String title;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+   
+  }
 
   @override
   Widget build(BuildContext context) {
-    final listBook = BookManager().items;
     return Scaffold(
-      appBar: AppBar(
-
-        title: Text("Ban Sach"),
-        actions: <Widget>[
-          buildShoppingCartIcon(),
-        ],
-      ),
-      drawer: const AppDrawer(),
-      body: Container(  
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 43, 25, 57).withOpacity(0.9)
+        appBar: AppBar(
+          title: const Image(
+            width: 150,
+            height: 50,
+            color: Colors.white,
+            image: NetworkImage('https://www.fiction-addiction.com/media/home/pictures/Bookshop_Logo_Dark.png')
+          ),
+          actions: <Widget>[
+            buildShoppingCartIcon(),
+          ],
         ),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: listBook.length,
-          itemBuilder: (BuildContext context, int index) {
-            return CardBook(listBook[index]);
-          }
-        )
-      )
+        drawer: const AppDrawer(),
+        body: _selectedIndex == 1 
+        ? FutureBuilder(  
+          future: _fetchBooks,
+          builder: (context, snapshot){
+            if(snapshot.connectionState == ConnectionState.done){
+              return Container(
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 43, 25, 57).withOpacity(0.9)),
+                  child: Consumer<BookManager>(  
+                      builder: (context, bookManager, child) => ListView.builder(
+                        itemCount: bookManager.itemCount,
+                        itemBuilder: (BuildContext context, int index){
+                          return CardBook(bookManager.books[index]);
+                        },
+                      ),
+                  )
+              );
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ) 
+        :_widgetOptions.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.production_quantity_limits),
+            label: 'Sản Phẩm',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.supervised_user_circle_rounded),
+            label: 'Tài Khoảng',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Color.fromARGB(255, 24, 172, 43),
+        onTap: _onItemTapped,
+      ),
     );
   }
 
-  Widget buildShoppingCartIcon() {
-    return TopRightBadge(
-      data: 0,
-      child: IconButton(
-        icon: const Icon(
-          Icons.shopping_cart,
-          color: Colors.red,
-        ),
-        onPressed: () {
-          Navigator.of(context).pushNamed(CartScreen.routeName);
-        },
+  Widget buildShoppingCartIcon(){
+    return Consumer<CartManager>(
+      builder: (ctx, CartManager, child){
+        return TopRightBadge(
+          data: CartManager.productCount,
+          child: IconButton(
+            icon: const Icon(  
+              Icons.shopping_cart,
+            ),
+            onPressed: () {
+              Navigator.of(context).pushNamed(CartScreen.routeName);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildProductFilterMenu() {
+    return PopupMenuButton(
+      onSelected: (FilterOptions selectedValue) {
+        // if (selectedValue == FilterOptions.favorites) {
+        //   _showOnlyFavorites.value = true;
+        // } else {
+        //   _showOnlyFavorites.value = false;
+        // }
+      },
+      icon: const Icon(
+        Icons.more_vert,
       ),
+      itemBuilder: (ctx) => [
+        const PopupMenuItem(
+          value: FilterOptions.favorites,
+          child: Text('Danh sách yêu thích'),
+        ),
+        const PopupMenuItem(
+          value: FilterOptions.all,
+          child: Text('Hiển thị tất cả'),
+        ),
+      ],
     );
   }
 }
-
