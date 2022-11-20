@@ -26,13 +26,13 @@ class _BookOverviewScreenState extends State<BookOverviewScreen> {
     _fetchBooks = context.read<BookManager>().fetchProducts();
   }
 
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   String titlePage = '';
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Home(),
-    Text('2'),
+    Text(''),
     InfoUser(),
   ];
 
@@ -89,8 +89,8 @@ class _BookOverviewScreenState extends State<BookOverviewScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.production_quantity_limits),
-            label: 'Sản Phẩm',
+            icon: Icon(Icons.book),
+            label: 'Sách',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.supervised_user_circle_rounded),
@@ -119,31 +119,6 @@ class _BookOverviewScreenState extends State<BookOverviewScreen> {
           ),
         );
       },
-    );
-  }
-
-  Widget buildProductFilterMenu() {
-    return PopupMenuButton(
-      onSelected: (FilterOptions selectedValue) {
-        // if (selectedValue == FilterOptions.favorites) {
-        //   _showOnlyFavorites.value = true;
-        // } else {
-        //   _showOnlyFavorites.value = false;
-        // }
-      },
-      icon: const Icon(
-        Icons.more_vert,
-      ),
-      itemBuilder: (ctx) => [
-        const PopupMenuItem(
-          value: FilterOptions.favorites,
-          child: Text('Danh sách yêu thích'),
-        ),
-        const PopupMenuItem(
-          value: FilterOptions.all,
-          child: Text('Hiển thị tất cả'),
-        ),
-      ],
     );
   }
 }

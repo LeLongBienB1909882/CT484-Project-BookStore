@@ -37,13 +37,13 @@ class _AuthCardState extends State<AuthCard> {
 
     try {
       if (_authMode == AuthMode.login) {
-        // Log user in
+        // Đăng nhập người dùng
         await context.read<AuthManager>().login(
               _authData['email']!,
               _authData['password']!,
             );
       } else {
-        // Sign user up
+        // Đăng ký người dùng
         await context.read<AuthManager>().signup(
               _authData['email']!,
               _authData['password']!,
@@ -54,7 +54,7 @@ class _AuthCardState extends State<AuthCard> {
           context,
           (error is HttpException)
               ? error.toString()
-              : 'Authentication failed');
+              : 'Quá trình xác thực đã thất bại');
     }
 
     _isSubmitting.value = false;
@@ -125,8 +125,7 @@ class _AuthCardState extends State<AuthCard> {
           color: Theme.of(context).primaryColor,
         ),
       ),
-      child:
-          Text('${_authMode == AuthMode.login ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
+      child: Text('${_authMode == AuthMode.login ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'} '),
     );
   }
 
@@ -143,19 +142,19 @@ class _AuthCardState extends State<AuthCard> {
           color: Theme.of(context).primaryTextTheme.headline6?.color,
         ),
       ),
-      child: Text(_authMode == AuthMode.login ? 'LOGIN' : 'SIGN UP'),
+      child: Text(_authMode == AuthMode.login ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ'),
     );
   }
 
   Widget _buildPasswordConfirmField() {
     return TextFormField(
       enabled: _authMode == AuthMode.signup,
-      decoration: const InputDecoration(labelText: 'Confirm Password'),
+      decoration: const InputDecoration(labelText: 'Xác nhận mật khẩu'),
       obscureText: true,
       validator: _authMode == AuthMode.signup
           ? (value) {
               if (value != _passwordController.text) {
-                return 'Passwords do not match!';
+                return 'Mất khẩu không hợp lệ!';
               }
               return null;
             }
@@ -165,12 +164,12 @@ class _AuthCardState extends State<AuthCard> {
 
   Widget _buildPasswordField() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: 'Password'),
+      decoration: const InputDecoration(labelText: 'Mật khẩu'),
       obscureText: true,
       controller: _passwordController,
       validator: (value) {
         if (value == null || value.length < 5) {
-          return 'Password is too short!';
+          return 'Mật khẩu quá ngắn!';
         }
         return null;
       },
@@ -186,7 +185,7 @@ class _AuthCardState extends State<AuthCard> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value!.isEmpty || !value.contains('@')) {
-          return 'Invalid email!';
+          return 'Email không hợp lệ!';
         }
         return null;
       },
