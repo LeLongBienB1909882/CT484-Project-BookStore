@@ -6,38 +6,35 @@ import 'package:provider/provider.dart';
 import '../shared/drawer.dart';
 import '../widgets/user_product_list_tile.dart';
 
-
 class UserBooksScreen extends StatelessWidget {
   static const routeName = '/user-products';
   const UserBooksScreen({super.key});
-
 
   Future<void> _refreshBook(BuildContext context) async {
     await context.read<BookManager>().fetchProducts();
   }
 
   @override
-
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     final bookManagers = context.read<BookManager>();
     return Scaffold(
-      appBar: AppBar(  
-        title: const Text('Quan li san pham'),
+      appBar: AppBar(
+        title: const Text('Quản lý sản phẩm'),
         actions: <Widget>[
           buildAddButton(context),
         ],
       ),
       drawer: const AppDrawer(),
       // body: buildUserProductListView(bookManagers)
-      body: FutureBuilder(  
+      body: FutureBuilder(
         future: _refreshBook(context),
-        builder: (ctx, snapshot){
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return const Center(  
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          return RefreshIndicator(  
+          return RefreshIndicator(
             onRefresh: () => _refreshBook(context),
             child: buildUserProductListView(bookManagers),
           );
@@ -46,12 +43,12 @@ class UserBooksScreen extends StatelessWidget {
     );
   }
 
-  Widget buildUserProductListView(BookManager bookManagers){
+  Widget buildUserProductListView(BookManager bookManagers) {
     return Consumer<BookManager>(
       builder: (context, bookManager, child) {
-         return ListView.builder(  
+        return ListView.builder(
           itemCount: bookManager.books.length,
-          itemBuilder: (context, index) => Column(  
+          itemBuilder: (context, index) => Column(
             children: [
               UserProductListTile(bookManager.books[index]),
               const Divider(),
@@ -62,8 +59,8 @@ class UserBooksScreen extends StatelessWidget {
     );
   }
 
-  Widget buildAddButton(BuildContext context){
-    return IconButton(  
+  Widget buildAddButton(BuildContext context) {
+    return IconButton(
       icon: const Icon(Icons.add),
       onPressed: () {
         Navigator.of(context).pushNamed(

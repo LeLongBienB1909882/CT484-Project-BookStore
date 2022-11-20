@@ -3,23 +3,24 @@ import 'package:provider/provider.dart';
 import '../manager/cart_manager.dart';
 import '../manager/order_manager.dart';
 import '../widgets/cart_item_card.dart';
+
 class CartScreen extends StatelessWidget {
   static const routeName = '/cart';
 
   const CartScreen({super.key});
 
-  @override 
-  Widget build(BuildContext context){
+  @override
+  Widget build(BuildContext context) {
     final cart = context.watch<CartManager>();
     return Scaffold(
-      appBar: AppBar(  
+      appBar: AppBar(
         title: const Text('Giỏ Hàng'),
       ),
-      body: Column(  
+      body: Column(
         children: <Widget>[
           buildCartSummary(cart, context),
           const SizedBox(height: 10),
-          Expanded(  
+          Expanded(
             child: buildCartDetails(cart),
           )
         ],
@@ -28,48 +29,54 @@ class CartScreen extends StatelessWidget {
   }
 }
 
-Widget buildCartDetails(CartManager cart){
-  return ListView.builder(  
-    itemCount: cart.productCount,
-    itemBuilder: (context, index) {
-      return CartItemCard(productId: cart.products[index].id, cardItem: cart.products[index]);
-    },
+Widget buildCartDetails(CartManager cart) {
+  return ListView(
+    children: cart.productEntries
+        .map(
+          (e) => CartItemCard(productId: e.key, cardItem: e.value),
+        )
+        .toList(),
+    // itemCount: cart.productCount,
+    // itemBuilder: (context, index) {
+    //   return CartItemCard(
+    //       productId: cart.products[index].id, cardItem: cart.products[index]);
+    // },
   );
 }
 
-Widget buildCartSummary(CartManager cart, BuildContext context){
+Widget buildCartSummary(CartManager cart, BuildContext context) {
   return Card(
     margin: const EdgeInsets.all(15),
-    child: Padding(  
+    child: Padding(
       padding: const EdgeInsets.all((8)),
-      child:  Row(  
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          const Text(  
-            'Total',
+          const Text(
+            'Tổng',
             style: TextStyle(fontSize: 20),
           ),
           const Spacer(),
-          Chip(  
-            label: Text(  
+          Chip(
+            label: Text(
               '\$${cart.totalAmount.toStringAsFixed(2)}',
-              style: TextStyle(  
+              style: TextStyle(
                 color: Theme.of(context).primaryTextTheme.headline6?.color,
               ),
             ),
             backgroundColor: Theme.of(context).primaryColor,
           ),
-          TextButton(  
+          TextButton(
             onPressed: cart.totalAmount <= 0
-            ? null
-            : () {
-              context.read<OrdersManager>().addOrder(
-                cart.products,
-                cart.totalAmount,
-              );
-              cart.clear();
-            },
-            style: TextButton.styleFrom(  
+                ? null
+                : () {
+                    context.read<OrdersManager>().addOrder(
+                          cart.products,
+                          cart.totalAmount,
+                        );
+                    cart.clear();
+                  },
+            style: TextButton.styleFrom(
               textStyle: TextStyle(color: Theme.of(context).primaryColor),
             ),
             child: const Text('Đặt Hàng'),

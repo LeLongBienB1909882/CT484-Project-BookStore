@@ -18,7 +18,7 @@ class InfoUser extends StatelessWidget {
             CircleAvatar(
               radius: 100.0,
               backgroundImage: NetworkImage(
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxqlvxC6znHwLTt--Jl00MKMeI8gcb50az3Q&usqp=CAU"),
+                  "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQh8EQgAuMYw_vwzL4TTBiLw6eJnV5cJDGQZe4aiZf6Ou2ErQy2"),
               backgroundColor: Colors.transparent,
             ),
             SizedBox(

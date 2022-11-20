@@ -20,11 +20,12 @@ class BookOverviewScreen extends StatefulWidget {
 class _BookOverviewScreenState extends State<BookOverviewScreen> {
   final _showOnlyFavorites = ValueNotifier<bool>(false);
   late Future<void> _fetchBooks;
-  @override 
-  void initState(){
+  @override
+  void initState() {
     super.initState();
     _fetchBooks = context.read<BookManager>().fetchProducts();
   }
+
   int _selectedIndex = 1;
   String titlePage = '';
   static const TextStyle optionStyle =
@@ -39,49 +40,49 @@ class _BookOverviewScreenState extends State<BookOverviewScreen> {
     setState(() {
       _selectedIndex = index;
     });
-   
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Image(
+      appBar: AppBar(
+        title: const Image(
             width: 150,
             height: 50,
             color: Colors.white,
-            image: NetworkImage('https://www.fiction-addiction.com/media/home/pictures/Bookshop_Logo_Dark.png')
-          ),
-          actions: <Widget>[
-            buildShoppingCartIcon(),
-          ],
-        ),
-        drawer: const AppDrawer(),
-        body: _selectedIndex == 1 
-        ? FutureBuilder(  
-          future: _fetchBooks,
-          builder: (context, snapshot){
-            if(snapshot.connectionState == ConnectionState.done){
-              return Container(
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 43, 25, 57).withOpacity(0.9)),
-                  child: Consumer<BookManager>(  
-                      builder: (context, bookManager, child) => ListView.builder(
-                        itemCount: bookManager.itemCount,
-                        itemBuilder: (BuildContext context, int index){
-                          return CardBook(bookManager.books[index]);
-                        },
-                      ),
-                  )
-              );
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ) 
-        :_widgetOptions.elementAt(_selectedIndex),
-        bottomNavigationBar: BottomNavigationBar(
+            image: NetworkImage(
+                'https://www.fiction-addiction.com/media/home/pictures/Bookshop_Logo_Dark.png')),
+        actions: <Widget>[
+          buildShoppingCartIcon(),
+        ],
+      ),
+      drawer: const AppDrawer(),
+      body: _selectedIndex == 1
+          ? FutureBuilder(
+              future: _fetchBooks,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Container(
+                      decoration: BoxDecoration(
+                          color:
+                              Color.fromARGB(255, 43, 25, 57).withOpacity(0.9)),
+                      child: Consumer<BookManager>(
+                        builder: (context, bookManager, child) =>
+                            ListView.builder(
+                          itemCount: bookManager.itemCount,
+                          itemBuilder: (BuildContext context, int index) {
+                            return CardBook(bookManager.books[index]);
+                          },
+                        ),
+                      ));
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            )
+          : _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -93,7 +94,7 @@ class _BookOverviewScreenState extends State<BookOverviewScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.supervised_user_circle_rounded),
-            label: 'Tài Khoảng',
+            label: 'Tài Khoản',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -103,13 +104,13 @@ class _BookOverviewScreenState extends State<BookOverviewScreen> {
     );
   }
 
-  Widget buildShoppingCartIcon(){
+  Widget buildShoppingCartIcon() {
     return Consumer<CartManager>(
-      builder: (ctx, CartManager, child){
+      builder: (ctx, CartManager, child) {
         return TopRightBadge(
           data: CartManager.productCount,
           child: IconButton(
-            icon: const Icon(  
+            icon: const Icon(
               Icons.shopping_cart,
             ),
             onPressed: () {

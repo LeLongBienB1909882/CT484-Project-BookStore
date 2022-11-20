@@ -12,7 +12,7 @@ import 'firebase_service.dart';
 class ProductsService extends FirebaseService {
   ProductsService([AuthToken? authToken]) : super(authToken);
 
-  Future<List<Book>> fetchProducts() async {
+  Future<List<Book>> fetchProducts(bool filterByUser) async {
     final List<Book> books = [];
     final prefs = await SharedPreferences.getInstance();
     final String? _token = prefs.getString('token');
@@ -21,14 +21,13 @@ class ProductsService extends FirebaseService {
       final productsUrl = Uri.parse('$databaseUrl/books.json?auth=$token');
       final response = await http.get(productsUrl);
       final productsMap = json.decode(response.body) as Map<String, dynamic>;
-      if(response.statusCode != 200){
+      if (response.statusCode != 200) {
         print(productsMap['error']);
         return books;
       }
-      
 
       productsMap.forEach((productId, product) {
-        books.add(  
+        books.add(
           Book.fromJson({
             'id': productId,
             ...product,
@@ -36,7 +35,7 @@ class ProductsService extends FirebaseService {
         );
       });
       return books;
-    }catch (error){
+    } catch (error) {
       print(error);
       return books;
     }
@@ -49,7 +48,7 @@ class ProductsService extends FirebaseService {
       final url = Uri.parse('$databaseUrl/books.json?auth=$token');
       final response = await http.post(
         url,
-        body: json.encode(   
+        body: json.encode(
           product.toJson()
             ..addAll({
               'creatorId': userId,
@@ -57,13 +56,13 @@ class ProductsService extends FirebaseService {
         ),
       );
 
-      if(response.statusCode != 200){
+      if (response.statusCode != 200) {
         throw Exception(json.decode(response.body)['error']);
       }
       return product.copyWith(
         id: json.decode(response.body)['name'],
       );
-    }catch(error){
+    } catch (error) {
       print(error);
       return null;
     }
@@ -71,16 +70,15 @@ class ProductsService extends FirebaseService {
 
   Future<bool> updateBook(Book product) async {
     try {
-      final url = Uri.parse('$databaseUrl/books/${product.id}.json?auth=$token');
-      final response = await http.patch(
-        url,
-        body: json.encode(product.toJson()),
-      );
-      if (response.statusCode != 200){
+      final url =
+          Uri.parse('$databaseUrl/books/${product.id}.json?auth=$token');
+      final response =
+          await http.patch(url, body: json.encode(product.toJson()));
+      if (response.statusCode != 200) {
         throw Exception(json.decode(response.body)['error']);
       }
       return true;
-    }catch(error){
+    } catch (error) {
       print(error);
       return false;
     }
@@ -91,11 +89,11 @@ class ProductsService extends FirebaseService {
       final url = Uri.parse('$databaseUrl/books/$id.json?auth=$token');
       final response = await http.delete(url);
 
-      if(response.statusCode != 200){
+      if (response.statusCode != 200) {
         throw Exception(json.decode(response.body)['error']);
       }
       return true;
-    }catch(error){
+    } catch (error) {
       print(error);
       return false;
     }
@@ -103,22 +101,21 @@ class ProductsService extends FirebaseService {
 
   Future<bool> saveFavoriteStatus(Book product) async {
     try {
-      final url = Uri.parse(  
-        '$databaseUrl/userFavorites/$userId/${product.id}.json?auth=$token'
-      );
-      final response = await http.put(  
+      final url = Uri.parse(
+          '$databaseUrl/userFavorites/$userId/${product.id}.json?auth=$token');
+      final response = await http.put(
         url,
-        body: json.encode(  
+        body: json.encode(
           product.isFavorite,
         ),
       );
 
-      if(response.statusCode != 200){
+      if (response.statusCode != 200) {
         throw Exception(json.decode(response.body)['error']);
       }
 
       return true;
-    }catch(error){
+    } catch (error) {
       print(error);
       return false;
     }

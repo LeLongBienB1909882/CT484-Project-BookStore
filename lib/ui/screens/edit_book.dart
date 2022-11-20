@@ -71,7 +71,7 @@ class _EditBookState extends State<EditBook> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Edit Product'),
+          title: const Text('Chỉnh sửa sản phẩm'),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.save),
@@ -104,24 +104,20 @@ class _EditBookState extends State<EditBook> {
     if (!isValid) {
       return;
     }
-
     _editForm.currentState!.save();
-
     setState(() {
       _isLoading = true;
     });
-
     try {
-      final bookManager = BookManager();
+      final bookManager = context.read<BookManager>();
       if (_editedProduct.id != null) {
         await bookManager.updateProduct(_editedProduct);
       } else {
         await bookManager.addProduct(_editedProduct);
       }
     } catch (error) {
-      await showErrorDialog(context, 'Something went wrong.');
+      await showErrorDialog(context, 'Đã có sự cố.');
     }
-
     setState(() {
       _isLoading = false;
     });
@@ -139,7 +135,7 @@ class _EditBookState extends State<EditBook> {
       autofocus: true,
       validator: (value) {
         if (value!.isEmpty) {
-          return "Please provide a value.";
+          return "Vui lòng cung cấp một giá trị.";
         }
         return null;
       },
@@ -157,13 +153,13 @@ class _EditBookState extends State<EditBook> {
       keyboardType: TextInputType.number,
       validator: (value) {
         if (value!.isEmpty) {
-          return 'Please enter a price.';
+          return 'Vui lòng nhập giá.';
         }
         if (double.tryParse(value) == null) {
-          return 'Please enter a valid number.';
+          return 'Vui lòng nhập một số hợp lệ.';
         }
         if (double.parse(value) <= 0) {
-          return 'Please enter a number greater than zero.';
+          return 'Vui lòng nhập một số lớn hơn 0.';
         }
         return null;
       },
@@ -176,15 +172,15 @@ class _EditBookState extends State<EditBook> {
   TextFormField buildDescriptionField() {
     return TextFormField(
       initialValue: _editedProduct.description,
-      decoration: const InputDecoration(labelText: 'Description'),
+      decoration: const InputDecoration(labelText: 'Mô tả'),
       maxLines: 3,
       keyboardType: TextInputType.multiline,
       validator: (value) {
         if (value!.isEmpty) {
-          return 'Please enter a description.';
+          return 'Vui lòng nhập mô tả.';
         }
         if (value.length < 10) {
-          return 'Should be at least 10 characters long.';
+          return 'Phải dài ít nhất 10 ký tự.';
         }
         return null;
       },
@@ -208,7 +204,7 @@ class _EditBookState extends State<EditBook> {
           decoration:
               BoxDecoration(border: Border.all(width: 1, color: Colors.grey)),
           child: _imageUrlController.text.isEmpty
-              ? const Text('Enter a URL')
+              ? const Text('Nhập một URL')
               : FittedBox(
                   child: Image.network(
                     _imageUrlController.text,
@@ -233,10 +229,10 @@ class _EditBookState extends State<EditBook> {
       onFieldSubmitted: (value) => _saveForm(),
       validator: (value) {
         if (value!.isEmpty) {
-          return 'Please enter an image URL.';
+          return 'Vui lòng nhập URL hình ảnh.';
         }
         if (!_isValidImageUrl(value)) {
-          return 'Please enter a valid image URL.';
+          return 'Vui lòng nhập URL hình ảnh hợp lệ.';
         }
         return null;
       },
